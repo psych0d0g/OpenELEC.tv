@@ -1,6 +1,6 @@
 ################################################################################
-#      Copyright (C) 2009-2010 OpenELEC.tv
-#      http://www.openelec.tv
+#      This file is part of OpenELEC - http://www.openelec.tv
+#      Copyright (C) 2013 Andreas Weinlein
 #
 #  This Program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,18 +18,20 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-# start Avahi Daemon
-#
-# runlevels: openelec, textmode
 
-(
-  wait_for_inet_addr
-  progress "Starting Avahi Daemon"
+PKG_NAME="xbmc-addon-rasplex-updater"
+PKG_VERSION="0.2.0"
+PKG_REV="1"
+PKG_ARCH="any"
+PKG_LICENSE="GPL"
+PKG_SITE="https://github.com/RasPlex/script.rasplex.update"
+PKG_URL="https://github.com/RasPlex/script.rasplex.update/archive/$PKG_VERSION.zip"
+PKG_DEPENDS=""
+PKG_BUILD_DEPENDS="toolchain"
+PKG_PRIORITY="optional"
+PKG_SECTION="mediacenter"
+PKG_SHORTDESC="xbmc-addon-rasplex-updater: RasPlex Updater add-on"
+PKG_LONGDESC="xbmc-addon-rasplex-updater: RasPlex Updater add-on"
+PKG_IS_ADDON="no"
 
-    mkdir -p /var/run/avahi-daemon
-    while true; do
-      wait_for_dbus
-      avahi-daemon --syslog > /dev/null 2>&1
-      sleep 500000
-    done
-)&
+PKG_AUTORECONF="no"

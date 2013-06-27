@@ -1,6 +1,8 @@
+#!/bin/sh
+
 ################################################################################
-#      Copyright (C) 2009-2010 OpenELEC.tv
-#      http://www.openelec.tv
+#      This file is part of OpenELEC - http://www.openelec.tv
+#      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
 #
 #  This Program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,18 +20,19 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-# start Avahi Daemon
-#
-# runlevels: openelec, textmode
+TEMP="0"
 
-(
-  wait_for_inet_addr
-  progress "Starting Avahi Daemon"
+if lspci -n | grep 0300 | grep -q 10de; then
+  [ -f /usr/bin/nvidia-smi ] && TEMP=`/usr/bin/nvidia-smi -q -x | grep 'gpu_temp' | awk '{ print $1 }' | sed 's,<gpu_temp>,,g'`
+fi
 
-    mkdir -p /var/run/avahi-daemon
-    while true; do
-      wait_for_dbus
-      avahi-daemon --syslog > /dev/null 2>&1
-      sleep 500000
-    done
-)&
+if lspci -n | grep 0300 | grep -q 1002; then
+	if [ -f /storage/.config/xorg.conf ]; then
+		XORG="/storage/.config/xorg.conf"
+	else
+		XORG="/etc/X11/xorg-fglrx.conf"
+	fi
+  [ -f /usr/bin/aticonfig ] && TEMP=`/usr/bin/aticonfig -i $XORG --od-gettemperature | grep Temperature | cut -f 2 -d "-" | cut -f 1 -d "." | sed -e "s, ,,"`
+fi
+
+echo "${TEMP} C"

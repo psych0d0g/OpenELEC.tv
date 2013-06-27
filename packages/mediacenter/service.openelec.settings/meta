@@ -1,6 +1,6 @@
 ################################################################################
-#      Copyright (C) 2009-2010 OpenELEC.tv
-#      http://www.openelec.tv
+#      This file is part of OpenELEC - http://www.openelec.tv
+#      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
 #
 #  This Program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,18 +18,19 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-# start Avahi Daemon
-#
-# runlevels: openelec, textmode
+PKG_NAME="service.openelec.settings"
+PKG_VERSION="0.1.8"
+PKG_REV="1"
+PKG_ARCH="any"
+PKG_LICENSE="prop."
+PKG_SITE="http://www.openelec.tv"
+PKG_URL="https://github.com/RasPlex/service.openelec.settings/archive/RP-$PKG_VERSION.zip"
+PKG_DEPENDS="connman hd-idle"
+PKG_BUILD_DEPENDS="toolchain python"
+PKG_PRIORITY="optional"
+PKG_SECTION="mediacenter"
+PKG_SHORTDESC="service.openelec.settings: Settings dialog for OpenELEC"
+PKG_LONGDESC="service.openelec.settings: is a settings dialog for OpenELEC"
+PKG_IS_ADDON="no"
 
-(
-  wait_for_inet_addr
-  progress "Starting Avahi Daemon"
-
-    mkdir -p /var/run/avahi-daemon
-    while true; do
-      wait_for_dbus
-      avahi-daemon --syslog > /dev/null 2>&1
-      sleep 500000
-    done
-)&
+PKG_AUTORECONF="no"

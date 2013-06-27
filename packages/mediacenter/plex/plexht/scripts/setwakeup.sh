@@ -1,6 +1,8 @@
+#!/bin/sh
+
 ################################################################################
-#      Copyright (C) 2009-2010 OpenELEC.tv
-#      http://www.openelec.tv
+#      This file is part of OpenELEC - http://www.openelec.tv
+#      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
 #
 #  This Program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,18 +20,9 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-# start Avahi Daemon
-#
-# runlevels: openelec, textmode
-
-(
-  wait_for_inet_addr
-  progress "Starting Avahi Daemon"
-
-    mkdir -p /var/run/avahi-daemon
-    while true; do
-      wait_for_dbus
-      avahi-daemon --syslog > /dev/null 2>&1
-      sleep 500000
-    done
-)&
+if [ -f /sys/class/rtc/rtc0/wakealarm ]; then
+  logger -t setwakeup.sh "### Setting system wakeup time ###"
+  echo 0 > /sys/class/rtc/rtc0/wakealarm
+  echo $1 > /sys/class/rtc/rtc0/wakealarm
+  logger -t setwakeup.sh "### $(cat /proc/driver/rtc) ###"
+fi

@@ -17,11 +17,55 @@
 #  the Free Software Foundation, 51 Franklin Street, Suite 500, Boston, MA 02110, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
-# Location of repo
-  UPDATEURL="http://sourceforge.net/projects/rasplex/files/autoupdate/`cat /etc/distribution`"
+# reset openelec
+# 
+# runlevels: openelec, textmode
 
-# Setup Download tool (wget/scp)
-  DL_METHOD="wget"
+get_target() {
+  for arg in $(cat /proc/cmdline); do
+    case $arg in
+      disk=*)
+        disk="${arg#*=}"
+        case $disk in
+          LABEL=*)
+            label="${disk#*=}"
+            target=`blkid -L $label`
+            ;;
+          UUID=*)
+            uuid="${disk#*=}"
+            target=`blkid -U $uuid`
+            ;;
+          /*)
+            target=$disk
+            ;;
+        esac
+        ;;
+    esac
+  done
+}
 
-# Keyfile to use (with scp method)
-  KEYFILE=""
+# hard reset
+if [ -f /storage/.cache/reset_oe ] ; then
+  get_target
+  if [ ! -z $target ] ; then
+    echo "hard resetting..."
+    umount /storage
+    mke2fs -t ext4 -m 0 $target 2>&1 >/dev/null
+    if [ ! -z $label ] ; then
+      tune2fs -U random -L $label $target
+    fi
+    if [ ! -z $uuid ] ; then
+      tune2fs -U $uuid $target
+    fi
+    reboot
+  fi
+fi
+
+# soft reset
+if [ -f /storage/.cache/reset_xbmc ] ; then
+  get_target
+  if [ ! -z $target ] ; then
+    echo "soft resetting..."
+    rm -rf /storage/.??* 2>&1 >/dev/null
+  fi
+fi
