@@ -118,7 +118,7 @@ function build {
         rm "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht/build"
     fi
 
-    time DEVTOOLS="$devtools" PROJECT=RPi ARCH=arm make release || exit 2
+    time DEVTOOLS="$devtools" PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2
 }
 
 # create image file
