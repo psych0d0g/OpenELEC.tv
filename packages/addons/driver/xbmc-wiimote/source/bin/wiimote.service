@@ -23,8 +23,8 @@
 . /etc/profile
 
 # Addon settings
-  ADDON_DIR="$HOME/.xbmc/addons/driver.remote.xbmc-wiimote"
-  ADDON_HOME="$HOME/.xbmc/userdata/addon_data/driver.remote.xbmc-wiimote"
+  ADDON_DIR="$HOME/.plexht/addons/driver.remote.xbmc-wiimote"
+  ADDON_HOME="$HOME/.plexht/userdata/addon_data/driver.remote.xbmc-wiimote"
 
 ################################################################################
 # start ps3d

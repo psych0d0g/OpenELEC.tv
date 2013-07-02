@@ -23,8 +23,8 @@
 . /etc/profile
 
 # Addon settings
-  ADDON_DIR="$HOME/.xbmc/addons/driver.remote.xbmc-ps3d"
-  ADDON_HOME="$HOME/.xbmc/userdata/addon_data/driver.remote.xbmc-ps3d"
+  ADDON_DIR="$HOME/.plexht/addons/driver.remote.xbmc-ps3d"
+  ADDON_HOME="$HOME/.plexht/userdata/addon_data/driver.remote.xbmc-ps3d"
   PIXMAPS_DIR="$ADDON_DIR/pixmaps"
 
   export PYTHONPATH="$PYTHONPATH:$ADDON_DIR/pylib"

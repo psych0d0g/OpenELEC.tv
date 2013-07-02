@@ -26,3 +26,7 @@ mkpkg-temp
 # backup files
 *.orig
 
+# original OpenELEC version file
+# (will be generated on build)
+/config/version
+

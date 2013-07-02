@@ -69,10 +69,11 @@ cd $PKG_BUILD
             --disable-ofono \
             --disable-dundee \
             --disable-pacrunner \
+            --disable-neard \
             --disable-wispr \
             --disable-tools \
             --enable-client \
             --enable-datafiles \
             --disable-silent-rules \
 
-make
+make storagedir=/storage/.cache/connman vpn_storagedir=/storage/.config/vpn-config statedir=/run/connman
