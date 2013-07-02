@@ -26,8 +26,10 @@
 (
   progress "Starting Syslog daemon"
 
-  source /var/config/settings.conf
-
+  if [ -f /var/config/settings.conf ]; then
+    . /var/config/settings.conf
+  fi
+  
   SYSLOGD_OPTIONS="-L"
 
   if [ "$SYSLOG_REMOTE" == "true" -a "$SYSLOG_SERVER" ]; then
