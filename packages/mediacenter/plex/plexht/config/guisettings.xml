@@ -419,7 +419,6 @@
     </subtitles>
     <system>
         <playlistspath pathversion="1">special://profile/playlists/</playlistspath>
-        <uuid>5be5fbfc-721c-441b-950e-acbc2481584e</uuid>
     </system>
     <updates>
         <checknow></checknow>
