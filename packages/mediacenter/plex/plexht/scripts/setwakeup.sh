@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
 #      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
@@ -17,32 +19,10 @@
 #  the Free Software Foundation, 51 Franklin Street, Suite 500, Boston, MA 02110, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
-# restore
-#
-# runlevels: openelec
 
-BACKUP_FILE=`ls -1 /storage/.restore/??????????????.tar 2>/dev/null | tail -1`
-
-if [ -e "$BACKUP_FILE" ] ; then
-  echo -en "please wait.. checking backup file: "
-  tar tf $BACKUP_FILE &>/dev/null
-  ret=$?
-  if [ $ret -eq 0 ] ; then
-    echo OK
-    echo -en "restoring.. this may take long time to complete, please wait.. "
-    rm -rf /storage/.plexht &>/dev/null
-    rm -rf $CONFIG_CACHE &>/dev/null
-    rm -rf /storage/.config &>/dev/null
-    tar xf $BACKUP_FILE -C / &>/dev/null
-    rm -f $BACKUP_FILE &>/dev/null
-    echo done
-    echo "all good. normal startup in 5s..."
-    sleep 5
-  else
-    echo FAILED
-    echo "normal startup in 30s..."
-    rm -f $BACKUP_FILE &>/dev/null
-    sleep 30
-  fi
+if [ -f /sys/class/rtc/rtc0/wakealarm ]; then
+  logger -t setwakeup.sh "### Setting system wakeup time ###"
+  echo 0 > /sys/class/rtc/rtc0/wakealarm
+  echo $1 > /sys/class/rtc/rtc0/wakealarm
+  logger -t setwakeup.sh "### $(cat /proc/driver/rtc) ###"
 fi
-

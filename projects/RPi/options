@@ -1,11 +1,8 @@
 # Name of the Distro to build (full name, without special charcters)
-  DISTRONAME="OpenELEC"
-  if [ "$XBMC" = "master" ]; then
-    DISTRONAME="${DISTRONAME}_Gotham"
-  fi
+  DISTRONAME="rasplex"
 
 # short project description
-  DESCRIPTION="OpenELEC is a fast and userfriendly XBMC Mediacenter distribution."
+  DESCRIPTION="Rasplex is a community driven port of Plex Home Theater for the Raspberry Pi."
 
 # Welcome Message for e.g. SSH Server (up to 5 Lines)
   GREETING0="##############################################"
@@ -15,19 +12,19 @@
   GREETING4=""
 
 # Hostname for target system (openelec)
-  HOSTNAME="openelec"
+  HOSTNAME="rasplex"
 
 # Root password to integrate in the target system
-  ROOT_PASSWORD="openelec"
+  ROOT_PASSWORD="rasplex"
 
 # User to integrate in the target system
-  USER_NAME="openelec"
+  USER_NAME="plexuser"
 
 # User group to integrate in the target system
-  USER_GROUP="openelec"
+  USER_GROUP="plexuser"
 
 # User password to integrate in the target system
-  USER_PASSWORD="openelec"
+  USER_PASSWORD="rasplex"
 
 # The TARGET_CPU variable controls which processor should be targeted for
 # generated code.
@@ -121,7 +118,7 @@
   SQUASHFS_COMPRESSION="lzo"
 
 # Mediacenter to use (xbmc / no)
-  MEDIACENTER="xbmc"
+  MEDIACENTER="plexht"
 
 # Skins to install (Confluence)
 # Space separated list is supported,

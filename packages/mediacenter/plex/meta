@@ -17,32 +17,19 @@
 #  the Free Software Foundation, 51 Franklin Street, Suite 500, Boston, MA 02110, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
-# restore
-#
-# runlevels: openelec
 
-BACKUP_FILE=`ls -1 /storage/.restore/??????????????.tar 2>/dev/null | tail -1`
-
-if [ -e "$BACKUP_FILE" ] ; then
-  echo -en "please wait.. checking backup file: "
-  tar tf $BACKUP_FILE &>/dev/null
-  ret=$?
-  if [ $ret -eq 0 ] ; then
-    echo OK
-    echo -en "restoring.. this may take long time to complete, please wait.. "
-    rm -rf /storage/.plexht &>/dev/null
-    rm -rf $CONFIG_CACHE &>/dev/null
-    rm -rf /storage/.config &>/dev/null
-    tar xf $BACKUP_FILE -C / &>/dev/null
-    rm -f $BACKUP_FILE &>/dev/null
-    echo done
-    echo "all good. normal startup in 5s..."
-    sleep 5
-  else
-    echo FAILED
-    echo "normal startup in 30s..."
-    rm -f $BACKUP_FILE &>/dev/null
-    sleep 30
-  fi
-fi
-
+PKG_NAME="plex"
+PKG_VERSION=""
+PKG_REV="1"
+PKG_ARCH="any"
+PKG_LICENSE="GPL"
+PKG_SITE="http://www.openelec.tv"
+PKG_URL=""
+PKG_DEPENDS="$MEDIACENTER"
+PKG_BUILD_DEPENDS="toolchain"
+PKG_PRIORITY="optional"
+PKG_SECTION="plex"
+PKG_SHORTDESC="PlexHomeTheater: Metapackage"
+PKG_LONGDESC=""
+PKG_IS_ADDON="no"
+PKG_AUTORECONF="no"
