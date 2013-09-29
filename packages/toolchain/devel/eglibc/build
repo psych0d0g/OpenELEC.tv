@@ -97,6 +97,7 @@ cat >option-groups.config <<EOF
 # needed for example with glib and Python:
   OPTION_EGLIBC_LOCALE_CODE = y
 
+# activeperl fails without libnsl. keep it enabled for now
   OPTION_EGLIBC_NIS = y
   OPTION_EGLIBC_NSSWITCH = y
   OPTION_EGLIBC_RCMD = n

@@ -1,5 +1,4 @@
 #!/bin/sh
-
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
 #      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
@@ -20,10 +19,23 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-. config/options $1
+case "$ACTION" in
+  add)
+    # check hfsplus filesystems
+    if [ "$ID_FS_TYPE" = "hfsplus" -a -x /bin/fsck.hfsplus ]; then
+      /bin/fsck.hfsplus -r -y $DEVNAME
+    fi
+    udevil --mount $DEVNAME
+    ;;
 
-mkdir -p $INSTALL/usr/lib
-  cp -P $PKG_BUILD/src/.libs/*.so* $INSTALL/usr/lib
+  change)
+    udevil --umount $DEVNAME
+    udevil --mount $DEVNAME
+    ;;
 
-mkdir -p $INSTALL/usr/config/aacs
-  cp -P $PKG_BUILD/KEYDB.cfg $INSTALL/usr/config/aacs
+  remove)
+    udevil --umount $DEVNAME
+    ;;
+esac
+
+exit 0
