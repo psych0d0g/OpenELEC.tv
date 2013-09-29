@@ -126,10 +126,10 @@ function create_image {
     echo "Creating SD image"
     mkdir -p $tmpdir
     rm -rf $tmpdir/*
-    cp $targetdir/$outfilename.tar.bz2 $tmpdir
+    cp "$targetdir/$outfilename".tar $tmpdir
     
     echo "  Extracting release tarball..."
-    tar -xpjf $tmpdir/$outfilename.tar.bz2 -C $tmpdir
+    tar -xpf "$tmpdir/$outfilename".tar -C $tmpdir
     
     echo "  Setup loopback device..."
     if [ "`losetup -f`" != "/dev/loop0" ];then
@@ -164,7 +164,7 @@ function upload_sourceforge {
     gzip "$outimagefile"
     
     echo "  uploading autoupdate package"
-    time scp "$outfilename.tar.bz2" "$user@frs.sourceforge.net:$projectdir/autoupdate/$distroname/"
+    time scp "$outfilename".tar "$user@frs.sourceforge.net:$projectdir/autoupdate/$distroname/"
     
     # enable auto-update for none-testing builds    
     if [ $testing -eq 0 ]; then
