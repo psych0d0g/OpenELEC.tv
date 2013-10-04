@@ -73,7 +73,6 @@ while true; do
 done
 
 # validate settings
-[ $devbuild -eq 1 -a $testing -eq 1 ] && echo "--debug and --testing can't used together" && exit 1
 [ -z "$version" ] && echo "Missing version number" && usage && exit 1
 
 # setup variables
@@ -160,14 +159,14 @@ function upload_sourceforge {
     
     echo "  uploading autoupdate package"
     time scp "$outfilename".tar "$user@frs.sourceforge.net:$projectdir/autoupdate/$distroname/"
-    
+     
     echo "  uploading install image"
     if [ $devbuild -eq 1 ];then
         releasedir="development"
     else
         releasedir="release"
     fi
-    time scp "$outimagefile.gz" "$user@frs.sourceforge.net:$projectdir/$releasedir/"
+    time scp "$outimagefile.gz" "$user@frs.sourceforge.net:$projectdir/$releasedir/"    
 }
 
 # main
