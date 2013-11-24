@@ -1,0 +1,12 @@
+# VERSION: set full version, use "devel" for development version
+  OPENELEC_VERSION="devel"
+
+# RASPLEX_VERSION: The version of rasplex
+  RASPLEX_VERSION="SET_RASPLEXVERSION"
+
+# OS_VERSION: OS Version
+  OS_VERSION="4.0"
+
+# ADDON_VERSION: Addon version
+  ADDON_VERSION="4.0"
+
