@@ -10,3 +10,4 @@
 # ADDON_VERSION: Addon version
   ADDON_VERSION="4.0"
 
+. config/rasplex

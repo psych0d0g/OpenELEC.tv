@@ -19,6 +19,7 @@
 ################################################################################
 
 PKG_NAME="plexht"
+PKG_VERSION="RP-$RASPLEX_VERSION"
 PKG_URL="https://github.com/RasPlex/plex-home-theatre/archive/$PKG_VERSION.zip"
 PKG_REV="1"
 PKG_ARCH="any"
