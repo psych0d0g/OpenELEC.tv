@@ -25,8 +25,9 @@ PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.plexapp.com"
-PKG_DEPENDS="boost Python zlib bzip2 systemd ffmpeg libass curl libssh rtmpdump fontconfig tinyxml freetype libmad libogg libmodplug faad2 flac libmpeg2 taglib yajl sqlite service.openelec.settings xbmc-addon-settings xbmc-addon-rasplex-updater htop"
-PKG_BUILD_DEPENDS="toolchain boost Python zlib bzip2 systemd lzo pcre swig ffmpeg libass enca curl libssh rtmpdump fontconfig fribidi tinyxml libjpeg-turbo libpng tiff freetype jasper libmad libsamplerate libogg libcdio libmodplug faad2 flac libmpeg2 taglib yajl sqlite libshairport"
+PKG_DEPENDS="boost Python zlib bzip2 systemd libass curl libssh rtmpdump fontconfig tinyxml freetype ffmpeg libmad libogg libmodplug faad2 flac libmpeg2 taglib yajl sqlite service.openelec.settings xbmc-addon-settings xbmc-addon-rasplex-updater htop"
+PKG_BUILD_DEPENDS_TARGET="toolchain boost Python zlib bzip2 systemd lzo pcre swig  libass enca curl libssh ffmpeg rtmpdump fontconfig fribidi tinyxml libjpeg-turbo libpng tiff freetype jasper libmad libsamplerate libogg libcdio libmodplug faad2 flac libmpeg2 taglib yajl sqlite"
+
 PKG_PRIORITY="optional"
 PKG_SECTION="plex"
 PKG_SHORTDESC="plexht: Plex Home Theater"
@@ -341,14 +342,25 @@ fi
 pre_configure_target() {
 
 
+set -x
+
 MAKEFLAGS=-j1
 strip_lto
 LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
+PACK_DIR=$ROOT/$BUILD/$PKG_NAME-$PKG_VERSION
+
+cd "$ROOT/$BUILD"
 cwd=`pwd`
-TOOLCHAIN_DIR="$(cd `dirname ../../toolchain` && pwd)/toolchain"
+[ -e $PACK_DIR ] && rm -rf $PACK_DIR
+unzip -d "$ROOT/sources/$PKG_NAME/$PKG_VERSION" -o "$ROOT/sources/$PKG_NAME/$PKG_VERSION.zip" &> /dev/null
+mv  $ROOT/sources/$PKG_NAME/$PKG_VERSION/*  $PACK_DIR
+rm -rf $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION/plex-home-theatre-$PKG_VERSION
+cd $PACK_DIR
+TOOLCHAIN_DIR="$ROOT/$BUILD/toolchain"
 echo $TOOLCHAIN_DIR
-cd $cwd
-echo $SRC_DIR
+
+cd "$ROOT/$BUILD/$PKG_NAME-$PKG_VERSION"
+
 cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
       -DCMAKE_INSTALL_PREFIX=$INSTALL/usr \
       -DENABLE_PYTHON=on \
@@ -360,6 +372,8 @@ cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
       -DRPI_EXTERNAL_PYTHON_HOME="$TOOLCHAIN_DIR/armv6zk-openelec-linux-gnueabi/sysroot/usr" \
       -DTARGET_PLATFORM=RPI \
       -DTARGET_RPI=1 \
+      -DTARGET_PREFIX=$TARGET_PREFIX \
+      -DSYSROOT_PREFIX=$SYSROOT_PREFIX \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
       $SRC_DIR
 
@@ -385,11 +399,17 @@ make VERBOSE=1
 post_makeinstall_target() {
 
 
-PYTHON_LIBDIR="`ls -d $INSTALL/usr/lib/python*`"
+echo "sysroot: $SYSROOT_PREFIX"
+echo "pkg dir: $PKG_DIR"
+PYTHON_LIBDIR=`ls -d $SYSROOT_PREFIX/usr/lib/python*`
+echo "$PYTHON_LIBDIR"
+echo "pkg build: $PKG_BUILD"
+echo "install $INSTALL"
 
 mkdir -p $INSTALL/usr/bin
   cp $PKG_DIR/scripts/cputemp $INSTALL/usr/bin
   cp $PKG_DIR/scripts/gputemp $INSTALL/usr/bin
+
   cp $PKG_DIR/scripts/setwakeup.sh $INSTALL/usr/bin
   cp $PKG_BUILD/tools/EventClients/Clients/XBMC\ Send/xbmc-send.py $INSTALL/usr/bin/xbmc-send
 
@@ -401,56 +421,54 @@ find build/lib -not \( -name CMakeFiles -prune \) \
     -regextype posix-extended -type f \
     -not -iregex ".*svn.*|.*win32(dx)?\.vis|.*osx\.vis" \
     -iregex ".*-linux.*|.*-arm.*|.*\.vis|.*\.xbs" \
-    -exec cp "{}" $ROOT/$INSTALL/usr/lib/plexhometheater/system/ ";"
+    -exec cp "{}" $INSTALL/usr/lib/plexhometheater/system/ ";"
 
   find system addons \
     -regextype posix-extended -type f \
     -not -iregex ".*svn.*|.*win32(dx)?\.vis|.*osx\.vis" \
     -iregex ".*-linux.*|.*-arm.*|.*\.vis|.*\.xbs" \
-    -exec install -D "{}" $ROOT/$INSTALL/usr/lib/plexhometheater/"{}" ";"
+    -exec install -D "{}" $INSTALL/usr/lib/plexhometheater/"{}" ";"
   
   find addons language media sounds userdata system \
     -regextype posix-extended -type f \
     -not -iregex ".*-linux.*|.*-arm.*|.*\.vis|.*\.xbs|.*svn.*|.*\.orig|.*\.so|.*\.dll|.*\.pyd|.*python|.*\.zlib|.*\.conf" \
-    -exec install -D -m 0644 "{}" $ROOT/$INSTALL/usr/share/xbmc/"{}" ";"
+    -exec install -D -m 0644 "{}" $INSTALL/usr/share/xbmc/"{}" ";"
 cd -
 
 if [ ! "$XBMC_SCR_RSXS" = yes ]; then
-  rm -rf $ROOT/$INSTALL/usr/share/xbmc/addons/screensaver.rsxs.*
+  rm -rf $INSTALL/usr/share/xbmc/addons/screensaver.rsxs.*
 fi
 
 if [ ! "$XBMC_VIS_PROJECTM" = yes ]; then
-  rm -rf $ROOT/$INSTALL/usr/share/xbmc/addons/visualization.projectm
+  rm -rf $INSTALL/usr/share/xbmc/addons/visualization.projectm
 fi
 
 
 
-rm -rf $ROOT/$INSTALL/usr/share/xbmc/addons/visualization.dxspectrum
-rm -rf $ROOT/$INSTALL/usr/share/xbmc/addons/visualization.itunes
-rm -rf $ROOT/$INSTALL/usr/share/xbmc/addons/visualization.milkdrop
+rm -rf $INSTALL/usr/share/xbmc/addons/visualization.dxspectrum
+rm -rf $INSTALL/usr/share/xbmc/addons/visualization.itunes
+rm -rf $INSTALL/usr/share/xbmc/addons/visualization.milkdrop
 rm -rf $INSTALL/usr/share/xbmc/addons/script.module.pysqlite
 rm -rf $INSTALL/usr/share/xbmc/addons/script.module.simplejson
 
-mkdir -p $INSTALL/usr/share/xbmc/addons
+  mkdir -p $INSTALL/usr/share/xbmc/addons
     cp -R $PKG_DIR/config/os.openelec.tv $INSTALL/usr/share/xbmc/addons
     $SED "s|@OS_VERSION@|$OS_VERSION|g" -i $INSTALL/usr/share/xbmc/addons/os.openelec.tv/addon.xml
     cp -R $PKG_DIR/config/repository.openelec.tv $INSTALL/usr/share/xbmc/addons
     $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/xbmc/addons/repository.openelec.tv/addon.xml
 
-mkdir -p $PYTHON_LIBDIR/site-packages/xbmc
-  cp -R $PKG_BUILD/tools/EventClients/lib/python/* $PYTHON_LIBDIR/site-packages/xbmc
+  mkdir -p $INSTALL/usr/lib/python"$PYTHON_VERSION"/site-packages/xbmc
+    cp -R tools/EventClients/lib/python/* $INSTALL/usr/lib/python"$PYTHON_VERSION"/site-packages/xbmc
+
 
 
 mkdir -p $INSTALL/usr/share/xbmc/system/
 mkdir -p $INSTALL/usr/bin/
 
-cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/xbmc/system/
-cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/xbmc/
-cp $PKG_DIR/config/guisettings.xml $INSTALL/usr/share/xbmc/system/
-cp $PKG_DIR/config/guisettings.xml $INSTALL/usr/share/xbmc/
-cp $PKG_DIR/bin/pastebin $INSTALL/usr/bin
-cp $PKG_DIR/bin/pastelog $INSTALL/usr/bin
-chmod +x $INSTALL/usr/bin/paste*
+#cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/xbmc/system/
+#cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/xbmc/
+#cp $PKG_DIR/config/guisettings.xml $INSTALL/usr/share/xbmc/system/
+#cp $PKG_DIR/config/guisettings.xml $INSTALL/usr/share/xbmc/
 
 
 }

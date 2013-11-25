@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. config/options $1
+
+# Unpack SRC
+cd $BUILD
+unzip -d $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION -o $ROOT/sources/$PKG_NAME/RP-$RASPLEX_VERSION.zip
+mv $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION/plex-home-theatre-$PKG_VERSION/lib/ffmpeg/* $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION
+rm -r $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION/plex-home-theatre-$PKG_VERSION
+

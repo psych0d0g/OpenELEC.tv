@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
 #      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
@@ -18,19 +20,9 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="nettle"
-PKG_VERSION="2.7"
-PKG_REV="1"
-PKG_ARCH="any"
-PKG_LICENSE="GPL"
-PKG_SITE="http://www.lysator.liu.se/~nisse/nettle"
-PKG_URL="http://www.lysator.liu.se/~nisse/archive/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_DEPENDS="gmp"
-PKG_BUILD_DEPENDS="toolchain gmp"
-PKG_PRIORITY="optional"
-PKG_SECTION="security"
-PKG_SHORTDESC="nettle: a cryptographic library"
-PKG_LONGDESC="Nettle is a cryptographic library that is designed to fit easily in more or less any context: In crypto toolkits for object-oriented languages (C++, Python, Pike, ...), in applications like LSH or GNUPG, or even in kernel space. In most contexts, you need more than the basic cryptographic algorithms, you also need some way to keep track of available algorithms, their properties and variants. You often have some algorithm selection process, often dictated by a protocol you want to implement."
-PKG_IS_ADDON="no"
-
-PKG_AUTORECONF="yes"
+if [ -f /sys/class/rtc/rtc0/wakealarm ]; then
+  logger -t setwakeup.sh "### Setting system wakeup time ###"
+  echo 0 > /sys/class/rtc/rtc0/wakealarm
+  echo $1 > /sys/class/rtc/rtc0/wakealarm
+  logger -t setwakeup.sh "### $(cat /proc/driver/rtc) ###"
+fi
