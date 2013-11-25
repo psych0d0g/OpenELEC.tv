@@ -349,6 +349,17 @@ strip_lto
 LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
 PACK_DIR=$ROOT/$BUILD/$PKG_NAME-$PKG_VERSION
 
+
+# PlexHT will crash on start without debug set. See card #176
+# #if [ "$DEBUG" = yes ]; then
+       CMAKE_BUILD_TYPE="Debug"
+#       #else
+#      CMAKE_BUILD_TYPE="Release"
+#      #fi
+
+
+
+
 cd "$ROOT/$BUILD"
 cwd=`pwd`
 [ -e $PACK_DIR ] && rm -rf $PACK_DIR
@@ -361,8 +372,11 @@ echo $TOOLCHAIN_DIR
 
 cd "$ROOT/$BUILD/$PKG_NAME-$PKG_VERSION"
 
+echo "install $INSTALL"
+echo "sysroot $SYSROOT_PREFIX"
+
 cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
-      -DCMAKE_INSTALL_PREFIX=$INSTALL/usr \
+      -DCMAKE_INSTALL_PREFIX=$SYSROOT_PREFIX/usr \
       -DENABLE_PYTHON=on \
       -DSWIG_EXECUTABLE=$TOOLCHAIN_DIR/bin/swig \
       -DSWIG_DIR=$TOOLCHAIN_DIR \
@@ -375,7 +389,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
       -DTARGET_PREFIX=$TARGET_PREFIX \
       -DSYSROOT_PREFIX=$SYSROOT_PREFIX \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-      $SRC_DIR
+	  $PACK_DIR
 
 
 
@@ -411,13 +425,13 @@ mkdir -p $INSTALL/usr/bin
   cp $PKG_DIR/scripts/gputemp $INSTALL/usr/bin
 
   cp $PKG_DIR/scripts/setwakeup.sh $INSTALL/usr/bin
-  cp $PKG_BUILD/tools/EventClients/Clients/XBMC\ Send/xbmc-send.py $INSTALL/usr/bin/xbmc-send
+  cp "$ROOT/$PKG_BUILD/tools/EventClients/Clients/XBMC Send/xbmc-send.py" $INSTALL/usr/bin/xbmc-send
 
 mkdir -p $INSTALL/usr/lib/plexhometheater/system
-  cp $PKG_BUILD/build/plex/plexhometheater $INSTALL/usr/lib/plexhometheater
+  cp "$ROOT/$PKG_BUILD/plex/plexhometheater" $INSTALL/usr/lib/plexhometheater
 
-cd $PKG_BUILD
-find build/lib -not \( -name CMakeFiles -prune \) \
+cd "$ROOT/$PKG_BUILD"
+find /lib -not \( -name CMakeFiles -prune \) \
     -regextype posix-extended -type f \
     -not -iregex ".*svn.*|.*win32(dx)?\.vis|.*osx\.vis" \
     -iregex ".*-linux.*|.*-arm.*|.*\.vis|.*\.xbs" \
@@ -452,9 +466,9 @@ rm -rf $INSTALL/usr/share/xbmc/addons/script.module.pysqlite
 rm -rf $INSTALL/usr/share/xbmc/addons/script.module.simplejson
 
   mkdir -p $INSTALL/usr/share/xbmc/addons
-    cp -R $PKG_DIR/config/os.openelec.tv $INSTALL/usr/share/xbmc/addons
+    cp -R "$PKG_DIR/config/os.openelec.tv" $INSTALL/usr/share/xbmc/addons
     $SED "s|@OS_VERSION@|$OS_VERSION|g" -i $INSTALL/usr/share/xbmc/addons/os.openelec.tv/addon.xml
-    cp -R $PKG_DIR/config/repository.openelec.tv $INSTALL/usr/share/xbmc/addons
+    cp -R "$PKG_DIR/config/repository.openelec.tv" $INSTALL/usr/share/xbmc/addons
     $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/xbmc/addons/repository.openelec.tv/addon.xml
 
   mkdir -p $INSTALL/usr/lib/python"$PYTHON_VERSION"/site-packages/xbmc
