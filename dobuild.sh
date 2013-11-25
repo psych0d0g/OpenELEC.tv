@@ -91,7 +91,7 @@ if [ $devbuild -eq 1 ];then
 fi
 
 scriptdir=$(cd `dirname $0` && pwd)
-outfilename="$distroname-RPi.arm-$version"
+outfilename="$distroname-RPi.arm-devel"
 tmpdir="$scriptdir/tmp"
 outimagename="$distroname-$version.img"
 outimagefile="$tmpdir/$outimagename"
@@ -126,10 +126,17 @@ function create_image {
     echo "Creating SD image"
     mkdir -p $tmpdir
     rm -rf $tmpdir/*
-    cp $targetdir/$outfilename.tar.bz2 $tmpdir
-    
+    outglob=$targetdir/$outfilename*.tar
+    set -x
+    outfilename=`ls -1rt $outglob | tail -n 1`
+    echo "outfile $outfilename"
+    cp $outfilename $tmpdir
+   
+    tmp=`echo $outfilename | sed s/\.[^\.]*$//`
+    outdirname=`basename $tmp`
+
     echo "  Extracting release tarball..."
-    tar -xpjf $tmpdir/$outfilename.tar.bz2 -C $tmpdir
+    tar -xvpf $outfilename -C $tmpdir
     
     echo "  Setup loopback device..."
     if [ "`losetup -f`" != "/dev/loop0" ];then
@@ -144,7 +151,7 @@ function create_image {
     dd if=/dev/zero of=$outimagefile bs=1M count=1500
     
     echo "  Write data to image..."
-    cd $tmpdir/$outfilename
+    cd $tmpdir/$outdirname
     ./create_sdcard  $loopback $outimagefile
     
     echo "Created SD image at $outimagefile"
