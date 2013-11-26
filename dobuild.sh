@@ -105,12 +105,19 @@ function build {
     echo "Building rasplex"
 
     source $scriptdir/config/version
+
+    rm -rf  $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-*
+    mkdir  $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version
     if [ $force_pht_update -eq 1 ]; then
         rm -r "sources/plexht"
         rm -r "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht"
     elif [ $force_pht_rebuild -eq 1 ]; then
         rm "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht/build"
     fi
+
+    [ ! -e $scriptdir/plex-home-theater/ ] && git clone git@github.com:RasPlex/plex-home-theatre.git
+    git --git-dir=$scriptdir/plex-home-theater/.git  fetch 
+    git --work-tree=$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version  --git-dir=$scriptdir/plex-home-theater/.git checkout RP-$version -- .
 
     time DEVTOOLS="$devtools" PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2
 }
