@@ -107,7 +107,7 @@ function build {
     source $scriptdir/config/version
 
     rm -rf  $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-*
-    mkdir  $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version
+    mkdir -p $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version
     if [ $force_pht_update -eq 1 ]; then
         rm -r "sources/plexht"
         rm -r "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht"
