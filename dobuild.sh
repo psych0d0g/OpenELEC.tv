@@ -115,8 +115,8 @@ function build {
         rm "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht/build"
     fi
 
-    [ ! -e $scriptdir/plex-home-theater/ ] && git clone git@github.com:RasPlex/plex-home-theatre.git
-    git --git-dir=$scriptdir/plex-home-theater/.git  fetch 
+    [ ! -e $scriptdir/plex-home-theater/ ] && git clone git@github.com:RasPlex/plex-home-theatre.git $scriptdir/plex-home-theater/
+    git --git-dir=$scriptdir/plex-home-theater/.git  fetch  || echo "Could not fetch remote refs :("
     git --work-tree=$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version  --git-dir=$scriptdir/plex-home-theater/.git checkout RP-$version -- .
 
     time DEVTOOLS="$devtools" PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2
