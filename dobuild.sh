@@ -20,9 +20,7 @@ function usage {
     [--user <user>]           : the sourceforge user to use
     
 optional build options:
-    --force-pht-rebuild       : will force a pht rebuild 
-    --force-pht-update        : will force a pht to download the latest code
-                                and will force a rebuild
+    -f       : will force a pht rebuild 
 
 default options can be set via $settingsfile and will be evaluated first.
 ";
@@ -58,11 +56,8 @@ while true; do
             fi
             user="$1"
             ;;
-        --force-pht-rebuild)
+        --f)
             force_pht_rebuild=1
-            ;;
-        --force-pht-update)
-            force_pht_update=1
             ;;
         --)
             shift; break;;
