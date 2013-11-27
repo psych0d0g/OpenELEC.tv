@@ -112,12 +112,14 @@ function build {
         rm -r "sources/plexht"
         rm -r "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht"
     elif [ $force_pht_rebuild -eq 1 ]; then
-        rm "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht/build"
+        rm -rf "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht"
     fi
 
     [ ! -e $scriptdir/plex-home-theater/ ] && git clone https://github.com/RasPlex/plex-home-theatre.git $scriptdir/plex-home-theater/
     git --git-dir=$scriptdir/plex-home-theater/.git  fetch  || echo "Could not fetch remote refs :("
+    git --git-dir=$scriptdir/plex-home-theater/.git checkout RP-$version 
     git --work-tree=$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version  --git-dir=$scriptdir/plex-home-theater/.git checkout RP-$version -- .
+    cp $scriptdir/tools/rasplex/sync-repo  $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version 
 
     time DEVTOOLS="$devtools" PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2
 }
