@@ -56,7 +56,7 @@ while true; do
             fi
             user="$1"
             ;;
-        --f)
+        -f)
             force_pht_rebuild=1
             ;;
         --)
@@ -103,11 +103,8 @@ function build {
 
     rm -rf  $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-*
     mkdir -p $scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/plexht-RP-$version
-    if [ $force_pht_update -eq 1 ]; then
-        rm -r "sources/plexht"
+    if [ $force_pht_rebuild -eq 1 ]; then
         rm -r "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht"
-    elif [ $force_pht_rebuild -eq 1 ]; then
-        rm -rf "$scriptdir/build.rasplex-RPi.arm-$OPENELEC_VERSION/.stamps/plexht"
     fi
 
     [ ! -e $scriptdir/plex-home-theater/ ] && git clone https://github.com/RasPlex/plex-home-theatre.git $scriptdir/plex-home-theater/
@@ -130,13 +127,13 @@ function create_image {
     tar -xpf "$tmpdir/$outfilename".tar -C $tmpdir
     
     echo "  Setup loopback device..."
-    if [ "`losetup -f`" != "/dev/loop0" ];then
-        umount /dev/loop0
-        losetup -d /dev/loop0  || eval 'echo "It demands loop0 instead of first free loopback device... : (" ; exit 1'
+    if [ "`sudo losetup -f`" != "/dev/loop0" ];then
+        sudo umount /dev/loop0
+        sudo losetup -d /dev/loop0  || eval 'echo "It demands loop0 instead of first free loopback device... : (" ; exit 1'
     fi
     
-    losetup -d /dev/loop0 || [ echo "It demands loop0 instead of first free device... : (" && exit 1 ]
-    loopback=`losetup -f`
+    sudo losetup -d /dev/loop0 || [ echo "It demands loop0 instead of first free device... : (" && exit 1 ]
+    loopback=`sudo losetup -f`
     
     echo "  Prepare image file..."
     dd if=/dev/zero of=$outimagefile bs=1M count=1500
