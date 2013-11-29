@@ -1,0 +1,186 @@
+#!/usr/bin/env python
+
+import os
+import time
+import traceback
+import argparse
+
+SCRIPTDIR=os.path.dirname(os.path.abspath(__file__))
+
+
+#read default settings
+#settingsfile=~/.rasplex
+#[ -f "$settingsfile" ] && source "$settingsfile"
+
+class Config:
+
+    def __init__(self,args):
+
+        if args.tag is not None:
+            self.version = args.tag
+        elif args.branch is not None:
+            self.version = args.branch
+        elif args.sha is not None:
+            self.version = args.sha
+        elif args.wip is not None:
+            self.version = "wip"
+
+        self.force = args.force
+	self.rebuild = args.rebuild
+
+        self.distroname = "rasplex"
+        self.devtools = False
+        self.outfilename="{}-RPi.arm-{}".format(self.distroname,self.version)
+        self.tmpdir = "{}/tmp".format(SCRIPTDIR)
+        self.outimagename = "{}-{}.img".format(self.distroname,self.version)
+        self.outimagefile = "{}/{}".format(self.tmpdir,self.outimagename)
+        self.tagetdir = "{}/target".format(SCRIPTDIR)
+
+        oeversion = open(os.path.join(SCRIPTDIR,"config/version"))
+
+        for line in oeversion:
+            if line.find("OPENELEC_VERSION") >=0:
+                self.oeversion = line.split("OPENELEC_VERSION=")[1].strip().replace("\"","")
+
+        oeversion.close()
+
+        rpversion = open(os.path.join(SCRIPTDIR,"config/rasplex"),"w")
+        rpversion.write(" \
+        RASPLEX_VERSION=\"{}\"\
+        DISTRONAME=\"{}\"\
+        ".format(self.version,self.distroname) )
+        rpversion.close()
+
+
+    def __str__(self):
+        strrep =""
+        for each in self.__dict__:
+            strrep += each + " => "+str(self.__dict__[each]) + "\n"
+	return strrep
+
+# build
+def  build(config):
+    print "Building rasplex"
+
+
+#    os.system("rm -rf  {}/build.rasplex-RPi.arm-{}/plexht*".format(SCRIPTDIR,
+#                                                                config.oeversion))
+    
+
+    if (config.force):
+        os.system("rm -r {}/build.rasplex-RPi.arm-{}/.stamps/plexht".format(SCRIPTDIR,config.oeversion))
+
+    if not os.path.isdir(os.path.join(SCRIPTDIR,"plex-home-theater")):
+        os.system("git clone https://github.com/RasPlex/plex-home-theatre.git {}/plex-home-theater/".format(SCRIPTDIR))
+
+    
+    if config.version == "wip":
+        os.system("ln -sf {}/plex-home-theater {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version))
+
+    else:
+        os.system("mkdir -p {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR, config.oeversion, config.version))
+        os.system("git --git-dir={}/plex-home-theater/.git  fetch".format(SCRIPTDIR))
+        os.system("git --git-dir={}/plex-home-theater/.git checkout {}".format(SCRIPTDIR,config.version)) 
+        os.system("git --work-tree={}/build.rasplex-RPi.arm-{}/plexht-{}  --git-dir={}/plex-home-theater/.git checkout {} -- .".format(
+                                                                            SCRIPTDIR,config.oeversion,config.version,SCRIPTDIR,config.version))
+        os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version)) 
+    os.system("PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2")
+
+# create image file
+#def create_image():
+#    print "Creating SD image"
+#    mkdir -p $tmpdir
+#    rm -rf $tmpdir/*
+#    cp "$targetdir/$outfilename".tar $tmpdir
+#    
+#    print "  Extracting release tarball..."
+#    tar -xpf "$tmpdir/$outfilename".tar -C $tmpdir
+#    
+#    print "  Setup loopback device..."
+#    if [ "`sudo losetup -f`" != "/dev/loop0" ];then
+#        sudo umount /dev/loop0
+#        sudo losetup -d /dev/loop0  || eval 'print "It demands loop0 instead of first free loopback device... : (" ; exit 1'
+#    fi
+#    
+#    sudo losetup -d /dev/loop0 || [ print "It demands loop0 instead of first free device... : (" && exit 1 ]
+#    loopback=`sudo losetup -f`
+#    
+#    print "  Prepare image file..."
+#    dd if=/dev/zero of=$outimagefile bs=1M count=1500
+#    
+#    print "  Write data to image..."
+#    cd $tmpdir/$outfilename
+#    ./create_sdcard  $loopback $outimagefile
+#    
+#    print "Created SD image at $outimagefile"
+#
+
+#def upload_sourceforge():
+#    projectdir="/home/frs/project/rasplex"
+#    projectdlbase="http://sourceforge.net/projects/rasplex/files"
+#    [ -z "$user" ] && user=`whoami`
+#    
+#    print "Distributing build"
+#    
+#    cd "$tmpdir"
+#
+#    print "  compressing image..."
+#    gzip "$outimagefile"
+#    
+#    print "  uploading autoupdate package"
+#    time scp "$outfilename".tar "$user@frs.sourceforge.net:$projectdir/autoupdate/$distroname/"
+#     
+#    print "  uploading install image"
+#    if [ $devbuild -eq 1 ];then
+#        releasedir="development"
+#    else
+#        releasedir="release"
+#    fi
+#    time scp "$outimagefile.gz" "$user@frs.sourceforge.net:$projectdir/$releasedir/"    
+#
+# main
+
+def main(args):
+
+    config = Config(args)
+    print config
+
+    if config.rebuild:
+        build(config)
+
+
+
+       #if [ $devbuild -eq 1 ];then
+    #    distroname="rasplexdev"
+    #    devtools="yes"
+    #    print "This is a development build!"
+    #fi
+# set rasplex config
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='A script for managing stack states')
+    reftype = parser.add_mutually_exclusive_group(required=True)
+    reftype.add_argument('-t', '--tag', help="Build against specified tag")
+    reftype.add_argument('-b', '--branch', help="Build against specified branch")
+    reftype.add_argument('-s', '--sha', help="Build against specified sha")
+    reftype.add_argument('-w', '--wip', action="store_true", help="Build against current working tree state")
+    parser.add_argument('-i', '--image', help="Generate .img file")
+    parser.add_argument('-f', '--force', action="store_true", help="force a rebuild of plexht")
+    parser.add_argument('-r', '--rebuild', action="store_true", help="Run a build")
+
+    args = parser.parse_args()
+
+
+    try:
+        start = time.time()
+        main(args)
+
+    except:
+        err = traceback.format_exc()
+        print err
+    finally:
+        end = time.time()
+ 
+    print "Request processed in {:04,.2f}s".format(end-start)
