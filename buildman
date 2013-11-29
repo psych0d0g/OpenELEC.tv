@@ -5,6 +5,7 @@ import sys
 import time
 import traceback
 import argparse
+from argparse import RawTextHelpFormatter
 
 SCRIPTDIR=os.path.dirname(os.path.abspath(__file__))
 
@@ -225,7 +226,16 @@ def main(args):
 # set rasplex config
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='A script for managing stack states')
+    parser = argparse.ArgumentParser(description='A script for managing stack states', formatter_class=RawTextHelpFormatter, epilog="""
+To update to latest rasplex-dev branches:\n
+\t./buildman -u\n
+To link plex-home-theater to build.rasplex-XXX/plexht-wip and run a build\n
+\t./buildman -w -r -f\n
+To build against the tag RP-X.X.X:\n
+\t./buildman -t RP-X.X.X -r -f\n
+To generate an image from completed build tagged RP-X.X.X:\n
+\t./buildman -t RP-X.X.X -i\n
+""")
     reftype = parser.add_mutually_exclusive_group(required=True)
     reftype.add_argument('-t', '--tag', help="Build against specified tag")
     reftype.add_argument('-b', '--branch', help="Build against specified branch")
