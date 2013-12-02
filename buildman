@@ -27,31 +27,51 @@ class Config:
         elif args.wip is not None:
             self.version = "wip"
 
+
         self.force = args.force
     	self.rebuild = args.rebuild
     	self.image  = args.image
 
         self.distroname = "rasplex"
         self.devtools = False
-        self.outfilename="{}-RPi.arm-{}".format(self.distroname,self.version)
         self.tmpdir = "{}/tmp".format(SCRIPTDIR)
         self.outimagename = "{}-{}.img".format(self.distroname,self.version)
         self.outimagefile = "{}/{}".format(self.tmpdir,self.outimagename)
         self.targetdir = "{}/target".format(SCRIPTDIR)
+        self.rpversion = self.version.replace("RP-","")
+        self.outfilename="{}-RPi.arm-{}".format(self.distroname,self.rpversion)
 
-        oeversion = open(os.path.join(SCRIPTDIR,"config/version"))
+        
+        configstr=""" 
+        RASPLEX_VERSION=\"{}\" # a numeric version is needed here if possible
+        RASPLEX_REF=\"{}\" # we want to preserve the exact ref that they gave us
+        DISTRONAME=\"{}\"
+        """.format(self.rpversion,self.version,self.distroname)
 
-        for line in oeversion:
-            if line.find("OPENELEC_VERSION") >=0:
-                self.oeversion = line.split("OPENELEC_VERSION=")[1].strip().replace("\"","")
 
-        oeversion.close()
+
+        if (args.debug):
+            configstr+="\nRASPLEX_BUILDTYPE=\"debug\""
+            configstr+="\nOPENELEC_VERSION=\"devel\""
+            self.buildtype_str="DEVTOOLS=\"yes\""
+            self.oeversion="devel"
+
+        else:
+            configstr+="\nRASPLEX_BUILDTYPE=\"release\""
+            self.buildtype_str=""
+
+            oeversion = open(os.path.join(SCRIPTDIR,"config/version"))
+
+            for line in oeversion:
+                if line.find("OPENELEC_VERSION") >=0:
+                    self.oeversion = line.split("OPENELEC_VERSION=")[1].strip().replace("\"","")
+
+            oeversion.close()
 
         rpversion = open(os.path.join(SCRIPTDIR,"config/rasplex"),"w")
-        rpversion.write(""" 
-        RASPLEX_VERSION=\"{}\"
-        DISTRONAME=\"{}\"
-        """.format(self.version,self.distroname) )
+
+
+        rpversion.write(configstr)
         rpversion.close()
 
 
@@ -81,13 +101,15 @@ def  build(config):
         os.system("ln -sf {}/plex-home-theater {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version))
 
     else:
+        print "Running build against ref {}".format(config.version)
         os.system("mkdir -p {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR, config.oeversion, config.version))
         os.system("git --git-dir={}/plex-home-theater/.git  fetch".format(SCRIPTDIR))
         #os.system("git --git-dir={}/plex-home-theater/.git checkout {}".format(SCRIPTDIR,config.version)) 
         os.system("git --work-tree={}/build.rasplex-RPi.arm-{}/plexht-{}  --git-dir={}/plex-home-theater/.git checkout {} -- .".format(
                                                                             SCRIPTDIR,config.oeversion,config.version,SCRIPTDIR,config.version))
         os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version)) 
-    os.system("PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2")
+
+    return os.system("{} PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2".format(config.buildtype_str))
 
 def create_image(config):
     print "Creating SD image"
@@ -124,24 +146,42 @@ def create_image(config):
 def update():
   
     
-    if not binaryQuestion("Are you sure you want to update? This will stash any uncommitted changes"):
+    if not binaryQuestion("Are you sure you want to update? This will stash any uncommitted changes. They can be restored with 'git stash apply'"):
         print "Update aborted by user"
         exit(0)
     
+    output = ""
 
-    os.system("git stash")
-    os.system("git checkout rasplex-dev")
-    os.system("git pull --rebase origin rasplex-dev")
+    print "Stashing changes"
+    try:
+   
+        sys.stdout.write( "Updating openelec...")
+        output += os.popen("git stash").read()
+        output += os.popen("git checkout rasplex-dev").read()
+        output += os.popen("git pull --rebase origin rasplex-dev").read()
+        print "done. OpenELEC is now at:"
+        print os.popen("git --no-pager log --pretty=o -n 1").read()
 
-    os.chdir("{}/plex-home-theater".format(SCRIPTDIR))
- 
-    os.system("git stash")
-    os.system("git checkout rasplex-dev")
-    os.system("git pull --rebase origin rasplex-dev")
+        sys.stdout.write("Updating plex-home-theater...") 
+        os.chdir("{}/plex-home-theater".format(SCRIPTDIR))
+        output+= os.popen("git stash").read()
+        output+= os.popen("git checkout rasplex-dev").read()
+        output+= os.popen("git pull --rebase origin rasplex-dev").read()
+        print "done. PlexHT is now at:"
+        print os.popen("git --no-pager log --pretty=o -n 1").read()
+    except:
+        err = traceback.format_exc()
+        print err
+
+        print "OH FUCK! Something went wrong! Blame Dale (be nice)"
+        print output
+        print "Check your stash, any unsaved work should still be there"
+        raise Exception
 
     print "Any uncommited changes you had are now stashed."
+    print "\tPlease run git stash apply to get your changes back (you may need to merge!)"
     print "Google git stash apply to figure out how to get them back"
-    print "Update complete, please re-run buildman"
+    print "Update complete, please re-run buildman to do a build"
 
 
 def binaryQuestion(question, default="yes"):
@@ -212,7 +252,10 @@ def main(args):
     print config
 
     if config.rebuild:
-        build(config)
+        rc = build(config)
+
+        if rc != 0:
+            exit(rc)
 
     if config.image:
         create_image(config)
@@ -245,6 +288,7 @@ To generate an image from completed build tagged RP-X.X.X:\n
     parser.add_argument('-i', '--image', action="store_true", help="Generate .img file from succesful build.")
     parser.add_argument('-r', '--rebuild', action="store_true", help="Run a build")
     parser.add_argument('-f', '--force', action="store_true", help="force a rebuild of plexht")
+    parser.add_argument('-d', '--debug', action="store_true", help="Build with debug tools")
 
     args = parser.parse_args()
 
@@ -253,6 +297,8 @@ To generate an image from completed build tagged RP-X.X.X:\n
         start = time.time()
         main(args)
 
+    except SystemExit:
+        pass
     except:
         err = traceback.format_exc()
         print err

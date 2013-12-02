@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
 #      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
@@ -18,19 +20,31 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="elfutils"
-PKG_VERSION="0.155"
-PKG_REV="1"
-PKG_ARCH="any"
-PKG_LICENSE="GPL"
-PKG_SITE="https://fedorahosted.org/elfutils/"
-PKG_URL="https://fedorahosted.org/releases/e/l/elfutils/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS="zlib"
-PKG_BUILD_DEPENDS="toolchain zlib"
-PKG_PRIORITY="required"
-PKG_SECTION="devel"
-PKG_SHORTDESC="elfutils: collection of utilities to handle ELF objects"
-PKG_LONGDESC="Elfutils is a collection of utilities, including eu-ld (a linker), eu-nm (for listing symbols from object files), eu-size (for listing the section sizes of an object or archive file), eu-strip (for discarding symbols), eu-readelf (to see the raw ELF file structures), and eu-elflint (to check for well-formed ELF files)."
-PKG_IS_ADDON="no"
+. config/options $1
 
-PKG_AUTORECONF="yes"
+cd $PKG_BUILD
+echo "building oprofile"
+sed -i 's/AM_CONFIG_HEADER/AC_CONFIG_HEADERS/g' configure.ac
+
+ABS_PKG_BUILD=`pwd`
+cd "../image/system"
+SYSTEMDIR=`pwd`
+echo "System dir:"
+echo $SYSTEMDIR
+cd $ABS_PKG_BUILD
+
+
+#https://github.com/nezticle/RaspberryPi-BuildRoot/blob/master/package/oprofile/oprofile.mk
+#http://www.raspberrypi.org/phpBB3/viewtopic.php?f=50&t=9228
+#http://oprofile.sourceforge.net/doc/detailed-parameters.html
+#http://ssvb.github.com/2011/08/23/yet-another-oprofile-tutorial.html
+./configure  \
+            --localstatedir=/var \
+            --with-kernel-support \
+            --prefix=$SYSTEMDIR \
+            --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --with-extra-includes=$SYSTEMDIR/usr/include \
+            --with-extra-libs=$SYSTEMDIR/usr/lib \
+            --with-binutils=$SYSTEMDIR/usr \
+            --enable-gui=no
