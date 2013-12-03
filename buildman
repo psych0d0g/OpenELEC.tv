@@ -253,6 +253,8 @@ To generate an image from completed build tagged RP-X.X.X:\n
         start = time.time()
         main(args)
 
+    except SystemExit:
+        pass
     except:
         err = traceback.format_exc()
         print err
