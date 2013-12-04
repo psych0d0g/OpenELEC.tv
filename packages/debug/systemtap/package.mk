@@ -18,20 +18,36 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="debug"
-PKG_VERSION=""
+PKG_NAME="systemtap"
+PKG_VERSION="2.4"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.openelec.tv"
-PKG_URL=""
-PKG_DEPENDS="gdb strace systemtap"
-PKG_BUILD_DEPENDS="toolchain"
+PKG_SITE="https://sourceware.org/systemtap/"
+PKG_URL="https://github.com/RasPlex/systemtap/archive/release-${PKG_VERSION}.zip"
+PKG_DEPENDS="elfutils"
+PKG_BUILD_DEPENDS="toolchain elfutils"
 PKG_PRIORITY="optional"
-PKG_SECTION="virtual"
-PKG_SHORTDESC="debug: Metapackage for installing debugging tools"
-PKG_LONGDESC="debug is a Metapackage for installing debugging tools"
+PKG_SECTION="devel"
+PKG_SHORTDESC="Systemtap profiler"
+PKG_LONGDESC="Hardcore profiler"
+PKG_IS_ADDON="no"
+PKG_AUTORECONF="no"
+
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+
+CC_FOR_BUILD="$HOST_CC"
+CFLAGS_FOR_BUILD="$HOST_CFLAGS"
+
+pre_configure_target() {
+  # gdb could fail on runtime if build with LTO support
+    strip_lto
+}
+
+PKG_CONFIGURE_OPTS_TARGET="--host=$TARGET_NAME\
+						   --target=$TARGET_NAME\
+						   --build=$HOST_NAME\
+						   --prefix=$SYSROOT_PREFIX/usr"
 
