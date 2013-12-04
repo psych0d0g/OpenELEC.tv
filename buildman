@@ -27,6 +27,7 @@ class Config:
         elif args.wip is not None:
             self.version = "wip"
 
+
         self.force = args.force
     	self.rebuild = args.rebuild
     	self.image  = args.image
@@ -48,10 +49,22 @@ class Config:
         oeversion.close()
 
         rpversion = open(os.path.join(SCRIPTDIR,"config/rasplex"),"w")
-        rpversion.write(""" 
+        
+        configstr=""" 
         RASPLEX_VERSION=\"{}\"
         DISTRONAME=\"{}\"
-        """.format(self.version,self.distroname) )
+        """.format(self.version,self.distroname)
+
+        if (args.debug):
+            configstr+="\nRASPLEX_BUILDTYPE=\"debug\""
+            self.buildtype_str="DEVTOOLS=\"yes\""
+
+        else:
+            configstr+="\nRASPLEX_BUILDTYPE=\"release\""
+            self.buildtype_str=""
+
+
+        rpversion.write(configstr)
         rpversion.close()
 
 
@@ -87,7 +100,8 @@ def  build(config):
         os.system("git --work-tree={}/build.rasplex-RPi.arm-{}/plexht-{}  --git-dir={}/plex-home-theater/.git checkout {} -- .".format(
                                                                             SCRIPTDIR,config.oeversion,config.version,SCRIPTDIR,config.version))
         os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version)) 
-    os.system("PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2")
+
+    os.system("{} PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2".format(config.buildtype_str))
 
 def create_image(config):
     print "Creating SD image"
@@ -263,6 +277,7 @@ To generate an image from completed build tagged RP-X.X.X:\n
     parser.add_argument('-i', '--image', action="store_true", help="Generate .img file from succesful build.")
     parser.add_argument('-r', '--rebuild', action="store_true", help="Run a build")
     parser.add_argument('-f', '--force', action="store_true", help="force a rebuild of plexht")
+    parser.add_argument('-d', '--debug', action="store_true", help="Build with debug tools")
 
     args = parser.parse_args()
 
