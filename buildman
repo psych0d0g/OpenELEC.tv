@@ -40,28 +40,33 @@ class Config:
         self.outimagefile = "{}/{}".format(self.tmpdir,self.outimagename)
         self.targetdir = "{}/target".format(SCRIPTDIR)
 
-        oeversion = open(os.path.join(SCRIPTDIR,"config/version"))
-
-        for line in oeversion:
-            if line.find("OPENELEC_VERSION") >=0:
-                self.oeversion = line.split("OPENELEC_VERSION=")[1].strip().replace("\"","")
-
-        oeversion.close()
-
-        rpversion = open(os.path.join(SCRIPTDIR,"config/rasplex"),"w")
         
         configstr=""" 
         RASPLEX_VERSION=\"{}\"
         DISTRONAME=\"{}\"
         """.format(self.version,self.distroname)
 
+
+
         if (args.debug):
             configstr+="\nRASPLEX_BUILDTYPE=\"debug\""
+            configstr+="\nOPENELEC_VERSION=\"devel\""
             self.buildtype_str="DEVTOOLS=\"yes\""
+            self.oeversion="devel"
 
         else:
             configstr+="\nRASPLEX_BUILDTYPE=\"release\""
             self.buildtype_str=""
+
+            oeversion = open(os.path.join(SCRIPTDIR,"config/version"))
+
+            for line in oeversion:
+                if line.find("OPENELEC_VERSION") >=0:
+                    self.oeversion = line.split("OPENELEC_VERSION=")[1].strip().replace("\"","")
+
+            oeversion.close()
+
+        rpversion = open(os.path.join(SCRIPTDIR,"config/rasplex"),"w")
 
 
         rpversion.write(configstr)
