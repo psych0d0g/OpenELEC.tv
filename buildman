@@ -124,24 +124,42 @@ def create_image(config):
 def update():
   
     
-    if not binaryQuestion("Are you sure you want to update? This will stash any uncommitted changes"):
+    if not binaryQuestion("Are you sure you want to update? This will stash any uncommitted changes. They can be restored with 'git stash apply'"):
         print "Update aborted by user"
         exit(0)
     
+    output = ""
 
-    os.system("git stash")
-    os.system("git checkout rasplex-dev")
-    os.system("git pull --rebase origin rasplex-dev")
+    print "Stashing changes"
+    try:
+   
+        sys.stdout.write( "Updating openelec...")
+        output += os.popen("git stash").read()
+        output += os.popen("git checkout rasplex-dev").read()
+        output += os.popen("git pull --rebase origin rasplex-dev").read()
+        print "done. OpenELEC is now at:"
+        print os.popen("git --no-pager log --pretty=o -n 1").read()
 
-    os.chdir("{}/plex-home-theater".format(SCRIPTDIR))
- 
-    os.system("git stash")
-    os.system("git checkout rasplex-dev")
-    os.system("git pull --rebase origin rasplex-dev")
+        sys.stdout.write("Updating plex-home-theater...") 
+        os.chdir("{}/plex-home-theater".format(SCRIPTDIR))
+        output+= os.popen("git stash").read()
+        output+= os.popen("git checkout rasplex-dev").read()
+        output+= os.popen("git pull --rebase origin rasplex-dev").read()
+        print "done. PlexHT is now at:"
+        print os.popen("git --no-pager log --pretty=o -n 1").read()
+    except:
+        err = traceback.format_exc()
+        print err
+
+        print "OH FUCK! Something went wrong! Blame Dale (be nice)"
+        print output
+        print "Check your stash, any unsaved work should still be there"
+        raise Exception
 
     print "Any uncommited changes you had are now stashed."
+    print "\tPlease run git stash apply to get your changes back (you may need to merge!)"
     print "Google git stash apply to figure out how to get them back"
-    print "Update complete, please re-run buildman"
+    print "Update complete, please re-run buildman to do a build"
 
 
 def binaryQuestion(question, default="yes"):
