@@ -31,10 +31,10 @@ PKG_DEPENDS="boost Python zlib bzip2 systemd libass curl libssh rtmpdump fontcon
 #PKG_BUILD_DEPENDS="toolchain boost Python zlib bzip2 systemd lzo pcre swig ffmpeg libass enca curl libssh rtmpdump fontconfig fribidi tinyxml libjpeg-turbo libpng tiff freetype jasper libmad libsamplerate libogg libcdio libmodplug faad2 flac libmpeg2 taglib yajl sqlite libshairport"
 PKG_BUILD_DEPENDS="toolchain boost Python zlib bzip2 systemd lzo pcre swig  libass enca curl libssh rtmpdump fontconfig fribidi tinyxml libjpeg-turbo libpng tiff freetype jasper libmad libsamplerate libogg libcdio libmodplug faad2 flac libmpeg2 taglib yajl sqlite libshairport"
 
-if [ $RASPLEX_BUILDTYPE == "debug" ];then
-    PKG_DEPENDS="${PKG_DEPENDS} debug"
-    PKG_BUILD_DEPENDS="${PKG_DEPENDS} debug"
-fi
+#if [ $RASPLEX_BUILDTYPE == "debug" ];then
+#    PKG_DEPENDS="${PKG_DEPENDS} debug"
+#    PKG_BUILD_DEPENDS="${PKG_DEPENDS} debug"
+#fi
 
 PKG_PRIORITY="optional"
 PKG_SECTION="plex"
