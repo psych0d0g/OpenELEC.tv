@@ -24,8 +24,8 @@ PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://sourceware.org/systemtap/"
-PKG_URL="https://github.com/RasPlex/systemtap/archive/release-${PKG_VERSION}.zip"
-PKG_DEPENDS="elfutils"
+PKG_URL="https://github.com/RasPlex/systemtap/archive/release-${PKG_VERSION}.tar.gz"
+PKG_DEPENDS="toolchain elfutils"
 PKG_BUILD_DEPENDS="toolchain elfutils"
 PKG_PRIORITY="optional"
 PKG_SECTION="devel"
@@ -37,17 +37,4 @@ PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
-
-CC_FOR_BUILD="$HOST_CC"
-CFLAGS_FOR_BUILD="$HOST_CFLAGS"
-
-pre_configure_target() {
-  # gdb could fail on runtime if build with LTO support
-    strip_lto
-}
-
-PKG_CONFIGURE_OPTS_TARGET="--host=$TARGET_NAME\
-						   --target=$TARGET_NAME\
-						   --build=$HOST_NAME\
-						   --prefix=$SYSROOT_PREFIX/usr"
 
