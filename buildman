@@ -34,17 +34,19 @@ class Config:
 
         self.distroname = "rasplex"
         self.devtools = False
-        self.outfilename="{}-RPi.arm-{}".format(self.distroname,self.version)
         self.tmpdir = "{}/tmp".format(SCRIPTDIR)
         self.outimagename = "{}-{}.img".format(self.distroname,self.version)
         self.outimagefile = "{}/{}".format(self.tmpdir,self.outimagename)
         self.targetdir = "{}/target".format(SCRIPTDIR)
+        self.rpversion = self.version.replace("RP-","")
+        self.outfilename="{}-RPi.arm-{}".format(self.distroname,self.rpversion)
 
         
         configstr=""" 
-        RASPLEX_VERSION=\"{}\"
+        RASPLEX_VERSION=\"{}\" # a numeric version is needed here if possible
+        RASPLEX_REF=\"{}\" # we want to preserve the exact ref that they gave us
         DISTRONAME=\"{}\"
-        """.format(self.version,self.distroname)
+        """.format(self.rpversion,self.version,self.distroname)
 
 
 
@@ -99,6 +101,7 @@ def  build(config):
         os.system("ln -sf {}/plex-home-theater {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version))
 
     else:
+        print "Running build against ref {}".format(config.version)
         os.system("mkdir -p {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR, config.oeversion, config.version))
         os.system("git --git-dir={}/plex-home-theater/.git  fetch".format(SCRIPTDIR))
         #os.system("git --git-dir={}/plex-home-theater/.git checkout {}".format(SCRIPTDIR,config.version)) 
@@ -106,7 +109,7 @@ def  build(config):
                                                                             SCRIPTDIR,config.oeversion,config.version,SCRIPTDIR,config.version))
         os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version)) 
 
-    os.system("{} PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2".format(config.buildtype_str))
+    return os.system("{} PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2".format(config.buildtype_str))
 
 def create_image(config):
     print "Creating SD image"
@@ -249,7 +252,10 @@ def main(args):
     print config
 
     if config.rebuild:
-        build(config)
+        rc = build(config)
+
+        if rc != 0:
+            exit(rc)
 
     if config.image:
         create_image(config)
