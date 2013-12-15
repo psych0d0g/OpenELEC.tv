@@ -319,7 +319,7 @@
   SWAP_SUPPORT="yes"
 
 # swapfile size if SWAP_SUPPORT=yes in MB
-  SWAPFILESIZE="512"
+  SWAPFILESIZE="250"
 
 # build with installer (yes / no)
   INSTALLER_SUPPORT="no"

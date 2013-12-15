@@ -58,7 +58,7 @@ class Config:
 
         else:
             configstr+="\nRASPLEX_BUILDTYPE=\"release\""
-            self.buildtype_str=""
+            self.buildtype_str="DEVTOOLS=\"yes\""
 
             oeversion = open(os.path.join(SCRIPTDIR,"config/version"))
 
@@ -134,7 +134,7 @@ def create_image(config):
 
     
     print "  Prepare image file..."
-    os.system("dd if=/dev/zero of={} bs=1M count=1500".format(config.outimagefile))
+    os.system("dd if=/dev/zero of={} bs=1M count=910".format(config.outimagefile))
     
     print "  Write data to image..."
     os.chdir("{}/{}".format(config.tmpdir,config.outfilename))
