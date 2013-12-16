@@ -18,34 +18,23 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="bcm2835-bootloader"
-PKG_VERSION="2425d18"
+PKG_NAME="tcpdump"
+PKG_VERSION="4.5.1"
 PKG_REV="1"
-PKG_ARCH="arm"
-PKG_LICENSE="nonfree"
-PKG_SITE="http://www.broadcom.com"
-PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS=""
-PKG_BUILD_DEPENDS_TARGET="toolchain linux"
+PKG_ARCH="any"
+PKG_LICENSE="GPL"
+PKG_SITE="http://www.tcpdump.org/"
+PKG_URL="https://github.com/the-tcpdump-group/tcpdump/archive/tcpdump-$PKG_VERSION.tar.gz"
+PKG_DEPENDS="toolchain libpcap"
+PKG_BUILD_DEPENDS="toolchain libpcap"
 PKG_PRIORITY="optional"
-PKG_SECTION="tools"
-PKG_SHORTDESC="bcm2835-bootloader: Tool to create a bootable kernel for RaspberryPi"
-PKG_LONGDESC="bcm2835-bootloader: Tool to create a bootable kernel for RaspberryPi"
+PKG_SECTION="devel"
+PKG_SHORTDESC="Dump and trace packets"
+PKG_LONGDESC="packet dump lib"
+PKG_IS_ADDON="no"
+PKG_AUTORECONF="no"
+
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-make_target() {
-  : # nothing to make
-}
-
-makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/bootloader
-    cp -PRv LICENCE* $INSTALL/usr/share/bootloader
-    cp -PRv bootcode.bin $INSTALL/usr/share/bootloader
-    cp -PRv fixup_x.dat $INSTALL/usr/share/bootloader/fixup.dat
-    cp -PRv start_x.elf $INSTALL/usr/share/bootloader/start.elf
-
-    cp -PRv $PKG_DIR/scripts/update.sh $INSTALL/usr/share/bootloader
-    cp -PRv $PKG_DIR/files/3rdparty/bootloader/config.txt $INSTALL/usr/share/bootloader
-}
