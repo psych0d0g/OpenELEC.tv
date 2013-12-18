@@ -343,8 +343,8 @@
   COREBOOT="no"
 
 # Distribution Specific source location
-  DISTRO_MIRROR="http://sources.openelec.tv/mirror"
-  DISTRO_SRC="http://sources.openelec.tv/$OPENELEC_VERSION"
+  DISTRO_MIRROR="http://sources.rasplex.com/mirror"
+  DISTRO_SRC="http://sources.rasplex.com/$OPENELEC_VERSION"
 
 # Addon Server Url
   ADDON_SERVER_URL="http://addons.openelec.tv"
