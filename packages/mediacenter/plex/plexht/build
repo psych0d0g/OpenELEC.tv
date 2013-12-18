@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
@@ -30,7 +30,7 @@ SRC_DIR=`pwd`
 cd build 
 [ -f Makefile ] && rm -rf *
 
-if [ $RASPLEX_BUILDTYPE == "debug" ];then
+if [ "$RASPLEX_BUILDTYPE" == "debug" ];then
       CMAKE_BUILD_TYPE="Debug"
 else
       CMAKE_BUILD_TYPE="Release"
