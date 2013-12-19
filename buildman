@@ -161,15 +161,13 @@ def update():
         sys.stdout.write( "Updating openelec...")
         output += os.popen("git stash").read()
         output += os.popen("git checkout rasplex-dev").read()
-        output += os.popen("git pull --rebase origin rasplex-dev").read()
+        output += os.popen("git pull origin rasplex-dev").read()
         print "done. OpenELEC is now at:"
         print os.popen("git --no-pager log --pretty=o -n 1").read()
 
         sys.stdout.write("Updating plex-home-theater...") 
-        output+= os.popen("git submodule update").read()
-        print "done. PlexHT is now at:"
-        os.chdir("{}/plex-home-theater".format(SCRIPTDIR))
-        print os.popen("git --no-pager log --pretty=o -n 1").read()
+        output+= os.popen("git submodule update --remote").read()
+        output+= os.popen("git submodule status").read()
     except:
         err = traceback.format_exc()
         print err
