@@ -93,7 +93,7 @@ def  build(config):
     
 
     if (config.force):
-        os.system("rm -r {}/build.rasplex-RPi.arm-{}/.stamps/plexht".format(SCRIPTDIR,config.oeversion))
+        os.system("rm -r {}/build.rasplex-RPi.arm-{}-{}/.stamps/plexht".format(SCRIPTDIR,config.oeversion,config.buildtype))
 
     if not os.path.isdir("{}/plex-home-theater".format(SCRIPTDIR,config.oeversion,config.buildtype)):
         os.system("git submodule init")
