@@ -3,7 +3,7 @@ branches:
    - rasplex-dev # for now
 
 before_script:
- - sudo apt-get update -gq
- - sudo apt-get install -gq bash bc gcc g++ sed patch fileutils tar bzip2 gzip perl coreutils gawk texinfo gperf cvs zip unzip xutils diff xsltproc default-jre parted
+ - sudo apt-get update -q
+ - sudo apt-get install -q bash bc gcc g++ sed patch fileutils tar bzip2 gzip perl coreutils gawk texinfo gperf cvs zip unzip xutils diff xsltproc default-jre parted
 
 script: "sudo ./buildman -wrfi"
