@@ -1,0 +1,9 @@
+branches:
+  only:
+   - rasplex-dev # for now
+
+before_script:
+ - sudo apt-get update -qg
+ - sudo apt-get install bash bc gcc g++ sed patch fileutils tar bzip2 gzip perl coreutils gawk texinfo gperf cvs zip unzip xutils diff xsltproc default-jre parted
+
+script: "sudo ./buildman -wrfi"
