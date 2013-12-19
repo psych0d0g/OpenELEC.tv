@@ -143,9 +143,10 @@ def create_image(config):
     
     print "  Write data to image..."
     os.chdir("{}/{}".format(config.tmpdir,config.outfilename))
-    os.system("./create_sdcard /dev/loop0 {}".format(config.outimagefile)) 
-    
-    print "Created SD image at {}".format(config.outimagefile)
+    rc=os.system("./create_sdcard /dev/loop0 {}".format(config.outimagefile)) 
+    if rc == 0: 
+        print "Created SD image at {}".format(config.outimagefile)
+    return rc
 
 
 def update():
@@ -259,8 +260,9 @@ def main(args):
             exit(rc)
 
     if config.image:
-        create_image(config)
+        rc = create_image(config)
 
+    exit(rc)
 
        #if [ $devbuild -eq 1 ];then
     #    distroname="rasplexdev"
