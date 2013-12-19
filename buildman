@@ -27,7 +27,7 @@ class Config:
         elif args.wip is not None:
             self.version = "wip"
 
-
+        self.ci = args.ci
         self.force = args.force
     	self.rebuild = args.rebuild
     	self.image  = args.image
@@ -114,8 +114,18 @@ def  build(config):
                                                                             SCRIPTDIR,config.oeversion,config.version,SCRIPTDIR,config.version))
         os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version)) 
 
-    return os.system("{} PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2".format(config.buildtype_str))
+    if config.ci:
+        pipe = os.popen("{} PROJECT=RPi ARCH=arm make release -j `nproc`".format(config.buildtype_str))
+        output = pipe.read()
+        lines = output.split("\n")
+        print lines[-9000:-1]
+        
+        rc = pipe.close()
+    else:
+        rc = os.system("{} PROJECT=RPi ARCH=arm make release -j `nproc` || exit 2".format(config.buildtype_str))
 
+
+    return rc
 def create_image(config):
     print "Creating SD image"
 
@@ -292,6 +302,7 @@ To generate an image from completed build tagged RP-X.X.X:\n
     parser.add_argument('-r', '--rebuild', action="store_true", help="Run a build")
     parser.add_argument('-f', '--force', action="store_true", help="force a rebuild of plexht")
     parser.add_argument('-d', '--debug', action="store_true", help="Build with debug tools")
+    parser.add_argument('-c', '--ci', action="store_true", help="Run as CI")
 
     args = parser.parse_args()
 
