@@ -8,7 +8,7 @@ before_script:
  - sudo apt-get update -q
  - sudo apt-get install -q bash bc gcc g++ sed patch tar bzip2 gzip perl coreutils gawk texinfo gperf cvs zip unzip xutils diff xsltproc default-jre parted libxml-parser-perl 
 
-script: "./buildman -cwrfi"
+script: "./buildman -cwrfi &>/dev/null"
 
 notifications:
   irc:

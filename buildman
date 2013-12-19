@@ -115,6 +115,7 @@ def  build(config):
         os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version)) 
 
     if config.ci:
+        print "building in CI mode"
         pipe = os.popen("{} PROJECT=RPi ARCH=arm make release -j `nproc`".format(config.buildtype_str))
         output = pipe.read()
         lines = output.split("\n")
