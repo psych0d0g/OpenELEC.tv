@@ -98,6 +98,8 @@ def  build(config):
 
     
     if config.version == "wip":
+        if not os.path.isdir("{}/build.rasplex-RPi.arm-{}".format(SCRIPTDIR,config.oeversion)):
+            os.mkdir("{}/build.rasplex-RPi.arm-{}".format(SCRIPTDIR,config.oeversion))
         os.system("ln -sf {}/plex-home-theater {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version))
 
     else:
