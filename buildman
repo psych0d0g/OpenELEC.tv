@@ -61,7 +61,7 @@ class Config:
 
         else:
             configstr+="\nRASPLEX_BUILDTYPE=\"release\""
-            self.buildtype_str=""
+            self.buildtype_str="LIVEDEBUG=\"yes\""
             self.buildtype="release"
 
             oeversion = open(os.path.join(SCRIPTDIR,"config/version"))
@@ -156,7 +156,7 @@ def create_image(config):
     
     print "  Write data to image..."
     os.chdir("{}/{}".format(config.tmpdir,config.outfilename))
-    rc=os.system("./create_sdcard /dev/loop0 {}".format(config.outimagefile)) 
+    rc=os.system("sudo ./create_sdcard /dev/loop0 {}".format(config.outimagefile)) 
     if rc == 0: 
         print "Created SD image at {}".format(config.outimagefile)
     return rc
