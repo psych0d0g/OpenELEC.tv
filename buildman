@@ -31,6 +31,7 @@ class Config:
         self.force = args.force
     	self.rebuild = args.rebuild
     	self.image  = args.image
+    	self.kernel  = args.kernel
 
         self.distroname = "rasplex"
         self.devtools = False
@@ -74,6 +75,7 @@ class Config:
 
         rpversion = open(os.path.join(SCRIPTDIR,"config/rasplex"),"w")
 
+        
 
         rpversion.write(configstr)
         rpversion.close()
@@ -92,7 +94,14 @@ def  build(config):
 
 #    os.system("rm -rf  {}/build.rasplex-RPi.arm-{}/plexht*".format(SCRIPTDIR,
 #                                                                config.oeversion))
-    
+   
+    if config.kernel:
+        kernel_stamps = ["linux","linux-drivers","linux-initramfs","busybox","busybox-initramfs"]
+
+        for stamp in kernel_stamps:
+            if stamp != "":
+                print "deleting stamp {}".format(stamp)
+                os.system("rm -r {}/build.rasplex-RPi.arm-{}-{}/.stamps/{}".format(SCRIPTDIR,config.oeversion,config.buildtype,stamp))
 
     if (config.force):
         os.system("rm -r {}/build.rasplex-RPi.arm-{}-{}/.stamps/plexht".format(SCRIPTDIR,config.oeversion,config.buildtype))
@@ -306,6 +315,7 @@ To generate an image from completed build tagged RP-X.X.X:\n
     parser.add_argument('-f', '--force', action="store_true", help="force a rebuild of plexht")
     parser.add_argument('-d', '--debug', action="store_true", help="Build with debug tools")
     parser.add_argument('-l', '--linkfast', action="store_true", help="Link PHT without linktime optimization")
+    parser.add_argument('-k', '--kernel', action="store_true", help="Force kernel and initramfs rebuild")
     parser.add_argument('-c', '--ci', action="store_true", help="Run as CI")
 
     args = parser.parse_args()
