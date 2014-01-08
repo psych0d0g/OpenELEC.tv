@@ -118,12 +118,12 @@ def  build(config):
 
     else:
         print "Running build against ref {}".format(config.version)
-        os.system("mkdir -p {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR, config.oeversion, config.version))
+        os.system("mkdir -p {}/build.rasplex-RPi.arm-{}-{}/plexht-{}".format(SCRIPTDIR, config.oeversion, config.buildtype, config.version))
         os.system("git --git-dir={}/plex-home-theater/.git  fetch".format(SCRIPTDIR))
         #os.system("git --git-dir={}/plex-home-theater/.git checkout {}".format(SCRIPTDIR,config.version)) 
-        os.system("git --work-tree={}/build.rasplex-RPi.arm-{}/plexht-{}  --git-dir={}/plex-home-theater/.git checkout {} -- .".format(
-                                                                            SCRIPTDIR,config.oeversion,config.version,SCRIPTDIR,config.version))
-        os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.version)) 
+        os.system("git --work-tree={}/build.rasplex-RPi.arm-{}-{}/plexht-{}  --git-dir={}/plex-home-theater/.git checkout {} -- .".format(
+                                                                            SCRIPTDIR,config.oeversion,config.buildtype,config.version,SCRIPTDIR,config.version))
+        os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.buildtype,config.version)) 
 
     if config.ci:
         print "building in CI mode"
@@ -154,7 +154,6 @@ def create_image(config):
     print "  Setup loopback device..."
     freedev = os.popen("sudo losetup -f").read().strip()
     print freedev
-
     if freedev != "/dev/loop0":
         os.system("sudo umount /dev/loop0")
         os.system("sudo losetup -d /dev/loop0")
