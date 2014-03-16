@@ -33,3 +33,4 @@ mkpkg-temp
 
 # Image output folder
 /tmp
+/rasplex-installer
