@@ -406,8 +406,8 @@
     echo $1
     while [ $clock -gt 0 ]; do
       echo $clock
-      sleep 1s 
-      clock=`expr $clock - 1`
+      /bin/busybox usleep 1000000
+      clock=`/bin/busybox expr $clock - 1`
     done
 
   }
