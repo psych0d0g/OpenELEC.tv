@@ -93,7 +93,10 @@ mkdir -p $PYTHON_LIBDIR/site-packages/xbmc
 
 mkdir -p $INSTALL/usr/share/xbmc/system/
 mkdir -p $INSTALL/usr/bin/
+mkdir -p $INSTALL/usr/share/xbmc/tools/
 
+cp $PKG_BUILD/plex/Resources/openelec_install_update.sh $INSTALL/usr/share/xbmc/tools/openelec_install_update.sh
+chmod +x $INSTALL/usr/share/xbmc/tools/openelec_install_update.sh
 cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/xbmc/system/
 cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/xbmc/
 cp $PKG_DIR/config/guisettings.xml $INSTALL/usr/share/xbmc/system/
