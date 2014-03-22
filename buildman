@@ -122,6 +122,12 @@ def  build(config):
         os.system("git --work-tree={}/build.rasplex-RPi.arm-{}-{}/plexht-{}  --git-dir={}/plex-home-theater/.git checkout {} -- .".format(
                                                                             SCRIPTDIR,config.oeversion,config.buildtype,config.version,SCRIPTDIR,config.version))
         os.system("cp {}/tools/rasplex/sync-repo  {}/build.rasplex-RPi.arm-{}-{}/plexht-{}".format(SCRIPTDIR,SCRIPTDIR,config.oeversion,config.buildtype,config.version)) 
+
+        verfile = open ("{}/build.rasplex-RPi.arm-{}-{}/plexht-{}/rasplex_version.txt".format(SCRIPTDIR,config.oeversion,config.buildtype,config.version),'w')
+        verfile.write(config.version.replace("RP-",""))
+        verfile.close()
+
+
     verfile = open ("{}/build.rasplex-RPi.arm-{}-{}/plexht-{}/GitRevision.txt".format(SCRIPTDIR,config.oeversion,config.buildtype,config.version),'w')
     verfile.write(version)
     verfile.close()
