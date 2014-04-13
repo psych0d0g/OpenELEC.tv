@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
@@ -29,14 +29,14 @@ SRC_DIR=`pwd`
 [ ! -d build ] && mkdir build
 [ -d build ] && rm -rf build && mkdir build && cd build
 
-if [ $RASPLEX_BUILDTYPE == "debug" ];then
+if [ "$RASPLEX_BUILDTYPE" == "debug" ];then
     CMAKE_BUILD_TYPE="Debug"
     strip_lto # way faster linking
 else
     CMAKE_BUILD_TYPE="Release"
 fi
 
-if [ $RASPLEX_SPEEDYLINK == "yes" ];then
+if [ "$RASPLEX_SPEEDYLINK" == "yes" ];then
   strip_lto # way faster linking
 
   unset LD_OPTIM
@@ -44,8 +44,7 @@ if [ $RASPLEX_SPEEDYLINK == "yes" ];then
   unset TARGET_LDFLAGS
   unset GCC_OPTIM
 
-  LD_OPTIM="-fuse-ld=gold"
-  env
+  export LD_OPTIM="-fuse-ld=gold"
 
 fi
 #LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
