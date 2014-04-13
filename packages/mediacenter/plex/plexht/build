@@ -45,6 +45,7 @@ if [ "$RASPLEX_SPEEDYLINK" == "yes" ];then
   unset GCC_OPTIM
 
   export LD_OPTIM="-fuse-ld=gold"
+  export LDFLAGS="-s"
 
 fi
 #LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
