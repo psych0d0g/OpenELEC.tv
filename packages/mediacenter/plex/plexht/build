@@ -37,11 +37,20 @@ else
 fi
 
 if [ $RASPLEX_SPEEDYLINK == "yes" ];then
-    strip_lto # way faster linking
+  strip_lto # way faster linking
+
+  unset LD_OPTIM
+  unset LDFLAGS
+  unset TARGET_LDFLAGS
+  unset GCC_OPTIM
+
+  LD_OPTIM="-fuse-ld=gold"
+  env
+
 fi
-MAKEFLAGS=-j1
-LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
+#LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
 TOOLCHAIN_DIR="$ROOT/$BUILD/toolchain"
+
 echo $TOOLCHAIN_DIR
 echo $SRC_DIR
 export PYTHON_EXEC="$TOOLCHAIN_DIR/armv6zk-openelec-linux-gnueabi/sysroot/usr/bin/python2.7"
