@@ -46,6 +46,7 @@ if [ "$RASPLEX_SPEEDYLINK" == "yes" ];then
 
   export LD_OPTIM="-fuse-ld=gold"
   export LDFLAGS="-s"
+
 fi
 #LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
 TOOLCHAIN_DIR="$ROOT/$BUILD/toolchain"
