@@ -45,7 +45,7 @@ if [ "$RASPLEX_SPEEDYLINK" == "yes" ];then
   unset GCC_OPTIM
 
   export LD_OPTIM="-fuse-ld=gold"
-  export LDFLAGS="-s"
+#  export LDFLAGS="-s"
 
 fi
 #LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
@@ -77,3 +77,9 @@ cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
 pwd
 #make VERBOSE=1 -j`nproc`
 ninja -j `nproc`
+
+# generate breakpad symbols
+ninja plex/CMakeFiles/PlexHomeTheater_symbols 
+
+# Strip the executable now that we have our breakpad symbols
+$TOOLCHAIN_DIR/bin/armv6zk-openelec-linux-gnueabi-strip plex/plexhometheater
