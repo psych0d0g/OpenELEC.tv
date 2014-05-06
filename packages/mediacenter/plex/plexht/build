@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
@@ -26,36 +26,47 @@
 cd $ROOT/$BUILD/$PKG_NAME-$RASPLEX_REF
 SRC_DIR=`pwd`
 
-[ ! -d build ] && mkdir build 
-cd build 
-[ -f Makefile ] && rm -rf *
+[ ! -d build ] && mkdir build
+[ -d build ] && rm -rf build && mkdir build && cd build
 
-if [ $RASPLEX_BUILDTYPE == "debug" ];then
+if [ "$RASPLEX_BUILDTYPE" == "debug" ];then
     CMAKE_BUILD_TYPE="Debug"
     strip_lto # way faster linking
 else
     CMAKE_BUILD_TYPE="Release"
 fi
 
-if [ $RASPLEX_SPEEDYLINK == "yes" ];then
-    strip_lto # way faster linking
+if [ "$RASPLEX_SPEEDYLINK" == "yes" ];then
+  strip_lto # way faster linking
+
+  unset LD_OPTIM
+  unset LDFLAGS
+  unset TARGET_LDFLAGS
+  unset GCC_OPTIM
+
+  export LD_OPTIM="-fuse-ld=gold"
+#  export LDFLAGS="-s"
+
 fi
-MAKEFLAGS=-j1
-LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
-cwd=`pwd`
-TOOLCHAIN_DIR="$(cd `dirname ../../toolchain` && pwd)/toolchain"
+#LDFLAGS=`echo $LDFLAGS | sed -e "s|-Wl,--as-needed||"`
+TOOLCHAIN_DIR="$ROOT/$BUILD/toolchain"
+
 echo $TOOLCHAIN_DIR
-cd $cwd
 echo $SRC_DIR
-cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
+export PYTHON_EXEC="$TOOLCHAIN_DIR/armv6zk-openelec-linux-gnueabi/sysroot/usr/bin/python2.7"
+cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
       -DCMAKE_INSTALL_PREFIX=$INSTALL/usr \
       -DENABLE_PYTHON=on \
       -DSWIG_EXECUTABLE=$TOOLCHAIN_DIR/bin/swig \
       -DSWIG_DIR=$TOOLCHAIN_DIR \
       -DLIBUSBDIR=$SYSROOT_PREFIX/usr \
+      -DENABLE_DUMP_SYMBOLS=on \
       -DOPTIONAL_INCLUDE_DIR=$SYSROOT_PREFIX/usr/include \
       -DCMAKE_INCLUDE_PATH="$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux;$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads;$TOOLCHAIN_DIR/armv6zk-openelec-linux-gnueabi/sysroot/usr/include/python2.7/" \
-      -DRPI_EXTERNAL_PYTHON_HOME="$TOOLCHAIN_DIR/armv6zk-openelec-linux-gnueabi/sysroot/usr" \
+      -DPYTHON_EXEC="$PYTHON_EXEC" \
+      -DEXTERNAL_PYTHON_HOME="$TOOLCHAIN_DIR/armv6zk-openelec-linux-gnueabi/sysroot/usr" \
+      -DHOST_BREAKPAD_HOME="$ROOT/tools/breakpad" \
+      -DIMAGE_BREAKPAD_HOME="$ROOT/$BUILD/image/system/usr" \
       -DTARGET_PLATFORM=RPI \
       -DTARGET_RPI=1 \
       -DTARGET_PREFIX=$TARGET_PREFIX \
@@ -64,4 +75,11 @@ cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
       $SRC_DIR
 
 pwd
-make VERBOSE=1 -j`nproc`
+#make VERBOSE=1 -j`nproc`
+ninja -j `nproc`
+
+# generate breakpad symbols
+ninja plex/CMakeFiles/PlexHomeTheater_symbols 
+
+# Strip the executable now that we have our breakpad symbols
+$TOOLCHAIN_DIR/bin/armv6zk-openelec-linux-gnueabi-strip plex/plexhometheater
